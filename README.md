@@ -111,3 +111,10 @@ tests/              pytest 自动化测试
 UI 设计参考与取舍见 `docs/UI_REFERENCES.md`。
 
 系统架构、ER 图、表结构和聚合 SQL 见 `docs/DESIGN.md`。
+
+课程设计报告：
+
+- Word 可编辑版：`docs/SK3017课程设计报告（个人记账本）.docx`
+- PDF 提交版：`docs/课程设计报告.pdf`
+
+报告正文已完成，封面中的姓名、学号、教学班、递交日期和签名需本人填写。
