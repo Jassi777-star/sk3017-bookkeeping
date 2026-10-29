@@ -11,13 +11,13 @@ const charts = {
 };
 
 const colors = {
-  green: "#2f6b52",
-  red: "#a34c44",
-  gold: "#b17b2d",
-  blue: "#436a8a",
-  grid: "#dce3de",
-  ink: "#17231e",
-  muted: "#68736e",
+  green: "#11986a",
+  red: "#ed654f",
+  gold: "#d89422",
+  blue: "#2457e6",
+  grid: "#e4e7ec",
+  ink: "#131722",
+  muted: "#737c8c",
 };
 
 function formatMoney(value) {

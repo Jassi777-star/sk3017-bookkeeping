@@ -3,9 +3,9 @@
 {% block content %}
 <section class="page-heading dashboard-heading">
   <div>
-    <p class="eyebrow">收支概览</p>
-    <h1>个人账本</h1>
-    <p class="page-subtitle">把每一笔收支变成清晰、可行动的月度视图。</p>
+    <p class="eyebrow">Financial overview</p>
+    <h1>财务概览</h1>
+    <p class="page-subtitle">当前周期 {{ default_month }} · 聚焦结余、支出结构与预算节奏</p>
   </div>
 </section>
 
@@ -27,30 +27,42 @@
       </select>
     </label>
     <div class="filter-actions">
-      <button type="submit">更新图表</button>
+      <button type="submit"><i data-lucide="refresh-cw" aria-hidden="true"></i>更新视图</button>
       <span class="muted" id="chart-status" aria-live="polite"></span>
     </div>
   </form>
 </section>
 
 <section class="metric-grid" aria-label="月度指标">
+  <article class="metric-card balance-card spotlight">
+    <div class="metric-top">
+      <span>本月结余</span>
+      <span class="metric-icon"><i data-lucide="wallet" aria-hidden="true"></i></span>
+    </div>
+    <strong id="metric-balance">¥0.00</strong>
+    <small>收入减去支出</small>
+  </article>
   <article class="metric-card income-card">
-    <span>本月收入</span>
+    <div class="metric-top">
+      <span>本月收入</span>
+      <span class="metric-icon"><i data-lucide="arrow-down-left" aria-hidden="true"></i></span>
+    </div>
     <strong id="metric-income">¥0.00</strong>
     <small>当月全部收入</small>
   </article>
   <article class="metric-card expense-card">
-    <span>本月支出</span>
+    <div class="metric-top">
+      <span>本月支出</span>
+      <span class="metric-icon"><i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+    </div>
     <strong id="metric-expense">¥0.00</strong>
     <small>当月全部支出</small>
   </article>
-  <article class="metric-card balance-card">
-    <span>本月结余</span>
-    <strong id="metric-balance">¥0.00</strong>
-    <small>收入减去支出</small>
-  </article>
   <article class="metric-card budget-card">
-    <span>月度预算</span>
+    <div class="metric-top">
+      <span>月度预算</span>
+      <span class="metric-icon"><i data-lucide="gauge" aria-hidden="true"></i></span>
+    </div>
     <strong id="metric-budget">未设置</strong>
     <div class="metric-progress" aria-hidden="true"><span id="budget-fill"></span></div>
     <small id="budget-meta">设置预算后显示使用进度</small>
@@ -59,10 +71,10 @@
 
 <aside class="budget-alert" id="budget-alert" hidden>
   <div>
-    <strong>本月支出已接近预算</strong>
+    <strong><i data-lucide="triangle-alert" aria-hidden="true"></i>本月支出已接近预算</strong>
     <p id="budget-alert-copy">预算使用已达到 80%，请留意后续支出。</p>
   </div>
-  <a id="budget-link" class="button secondary" href="{{ url_for('budget.budget_page', month=default_month) }}">调整预算</a>
+  <a id="budget-link" class="button secondary" href="{{ url_for('budget.budget_page', month=default_month) }}">调整预算<i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
 </aside>
 
 <section class="chart-grid">
@@ -72,6 +84,7 @@
         <h2>支出分类占比</h2>
         <p>看清本月支出主要流向</p>
       </div>
+      <span class="chart-chip">分类结构</span>
     </div>
     <div class="chart" id="category-chart" role="img" aria-label="支出分类占比饼图"></div>
   </article>
@@ -81,6 +94,7 @@
         <h2>近 6 个月收支</h2>
         <p>观察收入与支出的长期走势</p>
       </div>
+      <span class="chart-chip">趋势</span>
     </div>
     <div class="chart" id="months-chart" role="img" aria-label="近六个月收入和支出柱状图"></div>
   </article>
@@ -90,6 +104,7 @@
         <h2>当月每日支出</h2>
         <p>识别消费高峰和空白日期</p>
       </div>
+      <span class="chart-chip">日度</span>
     </div>
     <div class="chart" id="daily-chart" role="img" aria-label="当月每日支出折线图"></div>
   </article>
@@ -101,7 +116,7 @@
       <p class="eyebrow">最新动态</p>
       <h2>最近交易</h2>
     </div>
-    <a href="{{ url_for('entries.entries') }}">查看全部记录</a>
+    <a href="{{ url_for('entries.entries') }}">查看全部记录<i data-lucide="arrow-right" aria-hidden="true"></i></a>
   </div>
   {% if recent_transactions %}
     <div class="table-wrap">
@@ -118,11 +133,11 @@
         <tbody>
           {% for transaction in recent_transactions %}
             <tr>
-              <td>{{ transaction.occurred_on.isoformat() }}</td>
-              <td><span class="type-badge {{ transaction.type }}">{{ "收入" if transaction.type == "income" else "支出" }}</span></td>
-              <td>{{ transaction.category.name }}</td>
-              <td class="numeric {{ transaction.type }}">¥{{ "%.2f"|format(transaction.amount) }}</td>
-              <td>{{ transaction.note or "—" }}</td>
+              <td data-label="日期">{{ transaction.occurred_on.isoformat() }}</td>
+              <td data-label="类型"><span class="type-badge {{ transaction.type }}">{{ "收入" if transaction.type == "income" else "支出" }}</span></td>
+              <td data-label="分类">{{ transaction.category.name }}</td>
+              <td data-label="金额" class="numeric {{ transaction.type }}">¥{{ "%.2f"|format(transaction.amount) }}</td>
+              <td data-label="备注">{{ transaction.note or "—" }}</td>
             </tr>
           {% endfor %}
         </tbody>

@@ -12,8 +12,8 @@
   {% set endpoint = request.endpoint or "" %}
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="{{ url_for('dashboard.dashboard') }}">
-        <span class="brand-mark">¥</span>
+      <a class="brand" href="{{ url_for('dashboard.dashboard') }}" aria-label="个人账本首页">
+        <span class="brand-mark"><i data-lucide="wallet-cards" aria-hidden="true"></i></span>
         <span class="brand-copy">
           <strong>个人账本</strong>
           <small>Personal Ledger</small>
@@ -22,39 +22,38 @@
 
       <nav class="side-nav" aria-label="主导航">
         <a class="nav-link {% if endpoint.startswith('dashboard.') %}active{% endif %}" href="{{ url_for('dashboard.dashboard') }}">
-          <span class="nav-index">01</span>
-          <span>财务概览</span>
+          <span class="nav-icon"><i data-lucide="layout-dashboard" aria-hidden="true"></i></span>
+          <span class="nav-label">概览</span>
         </a>
         <a class="nav-link {% if endpoint.startswith('entries.') %}active{% endif %}" href="{{ url_for('entries.entries') }}">
-          <span class="nav-index">02</span>
-          <span>收支记录</span>
+          <span class="nav-icon"><i data-lucide="arrow-left-right" aria-hidden="true"></i></span>
+          <span class="nav-label">收支</span>
         </a>
         <a class="nav-link {% if endpoint.startswith('categories.') %}active{% endif %}" href="{{ url_for('categories.categories') }}">
-          <span class="nav-index">03</span>
-          <span>分类管理</span>
+          <span class="nav-icon"><i data-lucide="tags" aria-hidden="true"></i></span>
+          <span class="nav-label">分类</span>
         </a>
         <a class="nav-link {% if endpoint.startswith('budget.') %}active{% endif %}" href="{{ url_for('budget.budget_page') }}">
-          <span class="nav-index">04</span>
-          <span>月度预算</span>
+          <span class="nav-icon"><i data-lucide="target" aria-hidden="true"></i></span>
+          <span class="nav-label">预算</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
-        <span class="status-dot" aria-hidden="true"></span>
-        <div>
-          <strong>本地账本</strong>
-          <small>数据由你掌控</small>
-        </div>
+        <span class="avatar" aria-label="本地用户">本地</span>
       </div>
     </aside>
 
     <div class="app-main">
       <header class="topbar">
         <div class="topbar-copy">
-          <span class="topbar-kicker">SK3017 · COURSE PROJECT</span>
-          <strong>个人财务工作台</strong>
+          <span class="topbar-kicker">SK3017 · PERSONAL FINANCE</span>
+          <strong>让每一笔收支都有迹可循</strong>
         </div>
-        <a class="button topbar-action" href="{{ url_for('entries.new_entry') }}">新增交易</a>
+        <a class="button topbar-action" href="{{ url_for('entries.new_entry') }}">
+          <i data-lucide="plus" aria-hidden="true"></i>
+          新增交易
+        </a>
       </header>
 
       <main class="container" id="main-content">
@@ -71,5 +70,7 @@
       </main>
     </div>
   </div>
+  <script src="{{ url_for('static', filename='vendor/lucide.min.js') }}"></script>
+  <script>window.lucide?.createIcons();</script>
 </body>
 </html>

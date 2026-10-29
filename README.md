@@ -18,6 +18,12 @@ GitHub 仓库：`https://github.com/Jassi777-star/sk3017-bookkeeping`
 - 自定义 404/500 错误页和响应式侧栏应用壳层。
 - 60 条动态演示数据和默认分类。
 
+## 界面预览
+
+![财务概览](screenshots/dashboard-desktop.png)
+
+![移动端财务概览](screenshots/dashboard-mobile.png)
+
 ## 技术栈
 
 - Python 3.12
