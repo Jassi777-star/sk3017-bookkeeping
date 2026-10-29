@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}服务暂时不可用 | 个人记账本{% endblock %}
+{% block content %}
+<section class="error-page">
+  <span class="error-code">500</span>
+  <p class="eyebrow">服务暂时不可用</p>
+  <h1>账本遇到了一点问题</h1>
+  <p>请稍后重试。如果问题持续存在，请检查数据库连接和终端日志。</p>
+  <a class="button" href="{{ url_for('dashboard.dashboard') }}">返回财务概览</a>
+</section>
+{% endblock %}

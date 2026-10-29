@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}仪表盘 | 个人记账本{% endblock %}
+{% block content %}
+<section class="page-heading dashboard-heading">
+  <div>
+    <p class="eyebrow">收支概览</p>
+    <h1>个人账本</h1>
+    <p class="page-subtitle">把每一笔收支变成清晰、可行动的月度视图。</p>
+  </div>
+</section>
+
+<section class="panel filter-panel">
+  <form class="filter-grid dashboard-filter" id="dashboard-filter">
+    <label>
+      月份
+      <input type="month" name="month" id="month-filter" value="{{ default_month }}" required>
+    </label>
+    <label>
+      分类
+      <select name="category_id" id="category-filter">
+        <option value="">全部分类</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if selected_category == category.id|string %}selected{% endif %}>
+            {{ "收入" if category.type == "income" else "支出" }} · {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button type="submit">更新图表</button>
+      <span class="muted" id="chart-status" aria-live="polite"></span>
+    </div>
+  </form>
+</section>
+
+<section class="metric-grid" aria-label="月度指标">
+  <article class="metric-card income-card">
+    <span>本月收入</span>
+    <strong id="metric-income">¥0.00</strong>
+    <small>当月全部收入</small>
+  </article>
+  <article class="metric-card expense-card">
+    <span>本月支出</span>
+    <strong id="metric-expense">¥0.00</strong>
+    <small>当月全部支出</small>
+  </article>
+  <article class="metric-card balance-card">
+    <span>本月结余</span>
+    <strong id="metric-balance">¥0.00</strong>
+    <small>收入减去支出</small>
+  </article>
+  <article class="metric-card budget-card">
+    <span>月度预算</span>
+    <strong id="metric-budget">未设置</strong>
+    <div class="metric-progress" aria-hidden="true"><span id="budget-fill"></span></div>
+    <small id="budget-meta">设置预算后显示使用进度</small>
+  </article>
+</section>
+
+<aside class="budget-alert" id="budget-alert" hidden>
+  <div>
+    <strong>本月支出已接近预算</strong>
+    <p id="budget-alert-copy">预算使用已达到 80%，请留意后续支出。</p>
+  </div>
+  <a id="budget-link" class="button secondary" href="{{ url_for('budget.budget_page', month=default_month) }}">调整预算</a>
+</aside>
+
+<section class="chart-grid">
+  <article class="panel chart-panel">
+    <div class="chart-heading">
+      <div>
+        <h2>支出分类占比</h2>
+        <p>看清本月支出主要流向</p>
+      </div>
+    </div>
+    <div class="chart" id="category-chart" role="img" aria-label="支出分类占比饼图"></div>
+  </article>
+  <article class="panel chart-panel">
+    <div class="chart-heading">
+      <div>
+        <h2>近 6 个月收支</h2>
+        <p>观察收入与支出的长期走势</p>
+      </div>
+    </div>
+    <div class="chart" id="months-chart" role="img" aria-label="近六个月收入和支出柱状图"></div>
+  </article>
+  <article class="panel chart-panel chart-wide">
+    <div class="chart-heading">
+      <div>
+        <h2>当月每日支出</h2>
+        <p>识别消费高峰和空白日期</p>
+      </div>
+    </div>
+    <div class="chart" id="daily-chart" role="img" aria-label="当月每日支出折线图"></div>
+  </article>
+</section>
+
+<section class="panel recent-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">最新动态</p>
+      <h2>最近交易</h2>
+    </div>
+    <a href="{{ url_for('entries.entries') }}">查看全部记录</a>
+  </div>
+  {% if recent_transactions %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>类型</th>
+            <th>分类</th>
+            <th class="numeric">金额</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in recent_transactions %}
+            <tr>
+              <td>{{ transaction.occurred_on.isoformat() }}</td>
+              <td><span class="type-badge {{ transaction.type }}">{{ "收入" if transaction.type == "income" else "支出" }}</span></td>
+              <td>{{ transaction.category.name }}</td>
+              <td class="numeric {{ transaction.type }}">¥{{ "%.2f"|format(transaction.amount) }}</td>
+              <td>{{ transaction.note or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state compact">
+      <p>还没有交易记录，新增第一笔后会显示在这里。</p>
+    </div>
+  {% endif %}
+</section>
+
+<script>
+  window.dashboardConfig = {
+    categoryUrl: "{{ url_for('dashboard.category_statistics') }}",
+    monthsUrl: "{{ url_for('dashboard.monthly_statistics') }}",
+    dailyUrl: "{{ url_for('dashboard.daily_statistics') }}",
+    budgetUrl: "{{ url_for('budget.budget_status') }}"
+  };
+</script>
+<script src="{{ url_for('static', filename='vendor/echarts.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

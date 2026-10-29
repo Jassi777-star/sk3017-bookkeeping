@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}页面没有找到 | 个人记账本{% endblock %}
+{% block content %}
+<section class="error-page">
+  <span class="error-code">404</span>
+  <p class="eyebrow">页面没有找到</p>
+  <h1>这条路径不在账本里</h1>
+  <p>链接可能写错了，或者对应页面已经调整。</p>
+  <a class="button" href="{{ url_for('dashboard.dashboard') }}">返回财务概览</a>
+</section>
+{% endblock %}

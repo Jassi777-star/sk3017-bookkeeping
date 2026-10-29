@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}交易记录 | 个人记账本{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">收支记录</p>
+    <h1>交易记录</h1>
+    <p class="page-subtitle">筛选、核对并维护每一笔收入与支出。</p>
+  </div>
+  <a class="button" href="{{ url_for('entries.new_entry') }}">新增交易</a>
+</section>
+
+<section class="panel filter-panel">
+  <form method="get" class="filter-grid">
+    <label>
+      月份
+      <input type="month" name="month" value="{{ filters.month }}">
+    </label>
+    <label>
+      类型
+      <select name="type">
+        <option value="">全部类型</option>
+        <option value="expense" {% if filters.type == "expense" %}selected{% endif %}>支出</option>
+        <option value="income" {% if filters.type == "income" %}selected{% endif %}>收入</option>
+      </select>
+    </label>
+    <label>
+      分类
+      <select name="category_id">
+        <option value="">全部分类</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if filters.category_id == category.id|string %}selected{% endif %}>
+            {{ "收入" if category.type == "income" else "支出" }} · {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button type="submit">筛选</button>
+      <a class="text-link" href="{{ url_for('entries.entries') }}">清除</a>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  {% if transactions %}
+    <p class="muted">共 {{ pagination.total }} 条记录</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>类型</th>
+            <th>分类</th>
+            <th class="numeric">金额</th>
+            <th>备注</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in transactions %}
+            <tr>
+              <td>{{ transaction.occurred_on.isoformat() }}</td>
+              <td>{{ "收入" if transaction.type == "income" else "支出" }}</td>
+              <td>{{ transaction.category.name }}</td>
+              <td class="numeric {{ transaction.type }}">¥{{ "%.2f"|format(transaction.amount) }}</td>
+              <td>{{ transaction.note or "—" }}</td>
+              <td>
+                <div class="row-actions">
+                  <a href="{{ url_for('entries.edit_entry', entry_id=transaction.id) }}">编辑</a>
+                  <form method="post" action="{{ url_for('entries.delete_entry', entry_id=transaction.id) }}"
+                        onsubmit="return confirm('确定删除这笔交易吗？');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="danger-link">删除</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if pagination.pages > 1 %}
+      <nav class="pagination" aria-label="交易分页">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('entries.entries', month=filters.month, type=filters.type, category_id=filters.category_id, page=pagination.prev_num) }}">上一页</a>
+        {% endif %}
+        <span>第 {{ pagination.page }} / {{ pagination.pages }} 页</span>
+        {% if pagination.has_next %}
+          <a href="{{ url_for('entries.entries', month=filters.month, type=filters.type, category_id=filters.category_id, page=pagination.next_num) }}">下一页</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <h2>还没有交易记录</h2>
+      <p>先新增一笔收入或支出，这里会显示你的记录。</p>
+      <a class="button" href="{{ url_for('entries.new_entry') }}">记录第一笔</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

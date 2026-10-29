@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}个人记账本{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  {% set endpoint = request.endpoint or "" %}
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard.dashboard') }}">
+        <span class="brand-mark">¥</span>
+        <span class="brand-copy">
+          <strong>个人账本</strong>
+          <small>Personal Ledger</small>
+        </span>
+      </a>
+
+      <nav class="side-nav" aria-label="主导航">
+        <a class="nav-link {% if endpoint.startswith('dashboard.') %}active{% endif %}" href="{{ url_for('dashboard.dashboard') }}">
+          <span class="nav-index">01</span>
+          <span>财务概览</span>
+        </a>
+        <a class="nav-link {% if endpoint.startswith('entries.') %}active{% endif %}" href="{{ url_for('entries.entries') }}">
+          <span class="nav-index">02</span>
+          <span>收支记录</span>
+        </a>
+        <a class="nav-link {% if endpoint.startswith('categories.') %}active{% endif %}" href="{{ url_for('categories.categories') }}">
+          <span class="nav-index">03</span>
+          <span>分类管理</span>
+        </a>
+        <a class="nav-link {% if endpoint.startswith('budget.') %}active{% endif %}" href="{{ url_for('budget.budget_page') }}">
+          <span class="nav-index">04</span>
+          <span>月度预算</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="status-dot" aria-hidden="true"></span>
+        <div>
+          <strong>本地账本</strong>
+          <small>数据由你掌控</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <div class="topbar-copy">
+          <span class="topbar-kicker">SK3017 · COURSE PROJECT</span>
+          <strong>个人财务工作台</strong>
+        </div>
+        <a class="button topbar-action" href="{{ url_for('entries.new_entry') }}">新增交易</a>
+      </header>
+
+      <main class="container" id="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack" aria-live="polite">
+              {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+</body>
+</html>

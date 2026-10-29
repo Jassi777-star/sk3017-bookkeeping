@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}月度预算 | 个人记账本{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">预算计划</p>
+    <h1>月度预算</h1>
+    <p class="page-subtitle">为每个月设置支出上限，达到 80% 时仪表盘会主动提醒。</p>
+  </div>
+</section>
+
+<div class="budget-layout">
+  <section class="panel">
+    <h2>设置预算</h2>
+    <form method="post" class="stack-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>
+        月份
+        <input type="month" name="month" value="{{ month }}" required>
+      </label>
+      <label>
+        总预算
+        <input name="total_amount" inputmode="decimal" value="{% if status.has_budget %}{{ '%.2f'|format(status.total_amount) }}{% endif %}" placeholder="0.00" required>
+      </label>
+      <button type="submit">保存预算</button>
+    </form>
+  </section>
+
+  <section class="panel budget-preview">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">{{ month }}</p>
+        <h2>本月预算进度</h2>
+      </div>
+      <a href="{{ url_for('budget.budget_page', month=month) }}">刷新</a>
+    </div>
+    {% if status.has_budget %}
+      <div class="budget-numbers">
+        <strong>¥{{ "%.2f"|format(status.expense) }}</strong>
+        <span>/ ¥{{ "%.2f"|format(status.total_amount) }}</span>
+      </div>
+      <div class="progress-track" aria-label="预算使用进度">
+        <div class="progress-fill {% if status.alert %}warning{% endif %}" style="width: {{ [status.usage_ratio * 100, 100]|min }}%"></div>
+      </div>
+      <p class="muted">已使用 {{ "%.0f"|format(status.usage_ratio * 100) }}%{% if status.alert %}，请控制后续支出{% endif %}</p>
+    {% else %}
+      <div class="empty-state compact">
+        <p>这个月还没有设置预算。</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

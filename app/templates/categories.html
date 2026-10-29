@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}分类管理 | 个人记账本{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">基础设置</p>
+    <h1>分类管理</h1>
+    <p class="page-subtitle">保持分类简单、明确，让交易记录更容易复盘。</p>
+  </div>
+</section>
+
+<section class="panel">
+  <form method="post" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>
+      分类名称
+      <input name="name" maxlength="50" required placeholder="例如：早餐">
+    </label>
+    <label>
+      类型
+      <select name="type" required>
+        <option value="expense">支出</option>
+        <option value="income">收入</option>
+      </select>
+    </label>
+    <button type="submit">新增分类</button>
+  </form>
+</section>
+
+<div class="two-column">
+  <section class="panel">
+    <h2>支出分类</h2>
+    <ul class="tag-list">
+      {% for category in expense_categories %}
+        <li>{{ category.name }}</li>
+      {% else %}
+        <li class="muted">暂无支出分类</li>
+      {% endfor %}
+    </ul>
+  </section>
+  <section class="panel">
+    <h2>收入分类</h2>
+    <ul class="tag-list">
+      {% for category in income_categories %}
+        <li>{{ category.name }}</li>
+      {% else %}
+        <li class="muted">暂无收入分类</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}
