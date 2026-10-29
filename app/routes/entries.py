@@ -72,7 +72,10 @@ def _parse_entry_form():
 
 @entries_bp.route("")
 def entries():
-    month_value = request.args.get("month", "").strip()
+    if "month" in request.args:
+        month_value = request.args.get("month", "").strip()
+    else:
+        month_value = date.today().strftime("%Y-%m")
     selected_type = request.args.get("type", "").strip()
     category_value = request.args.get("category_id", "").strip()
     page = request.args.get("page", 1, type=int)

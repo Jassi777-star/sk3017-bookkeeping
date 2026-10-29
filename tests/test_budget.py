@@ -72,3 +72,31 @@ def test_budget_rejects_negative_amount(app, client):
     assert "预算必须为非负数".encode() in response.data
     with app.app_context():
         assert MonthlyBudget.query.count() == 0
+
+
+def test_budget_below_threshold_does_not_alert(app, client):
+    with app.app_context():
+        category = Category(name="餐饮", type="expense")
+        db.session.add(category)
+        db.session.flush()
+        db.session.add(
+            MonthlyBudget(
+                month=date(2026, 10, 1),
+                total_amount=Decimal("1000.00"),
+            )
+        )
+        db.session.add(
+            Transaction(
+                type="expense",
+                category=category,
+                amount=Decimal("799.99"),
+                occurred_on=date(2026, 10, 10),
+            )
+        )
+        db.session.commit()
+
+    response = client.get("/api/budget?month=2026-10")
+
+    assert response.status_code == 200
+    assert response.get_json()["usage_ratio"] == 0.8
+    assert response.get_json()["alert"] is False

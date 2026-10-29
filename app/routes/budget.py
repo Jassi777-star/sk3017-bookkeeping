@@ -18,15 +18,15 @@ def _budget_status(month):
     budget = MonthlyBudget.query.filter_by(month=month).first()
     expense = month_expense_total(month)
     total = _float(budget.total_amount) if budget else 0.0
-    ratio = round(expense / total, 2) if total else 0.0
+    raw_ratio = expense / total if total else 0.0
     return {
         "month": month.strftime("%Y-%m"),
         "total_amount": total,
         "expense": expense,
         "remaining": round(max(total - expense, 0), 2),
-        "usage_ratio": ratio,
+        "usage_ratio": round(raw_ratio, 2),
         "has_budget": budget is not None,
-        "alert": budget is not None and ratio >= 0.8,
+        "alert": budget is not None and raw_ratio >= 0.8,
     }
 
 

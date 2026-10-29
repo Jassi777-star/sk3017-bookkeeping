@@ -112,3 +112,70 @@ def test_statistics_reject_invalid_month(client):
 
     assert response.status_code == 400
     assert "月份格式应为 YYYY-MM" in response.get_json()["error"]
+
+
+def test_statistics_use_half_open_month_boundaries(app, client):
+    with app.app_context():
+        category = Category(name="餐饮", type="expense")
+        db.session.add(category)
+        db.session.commit()
+        db.session.add_all(
+            [
+                Transaction(
+                    type="expense",
+                    category_id=category.id,
+                    amount=Decimal("999.00"),
+                    occurred_on=date(2026, 9, 30),
+                ),
+                Transaction(
+                    type="expense",
+                    category_id=category.id,
+                    amount=Decimal("10.00"),
+                    occurred_on=date(2026, 10, 1),
+                ),
+                Transaction(
+                    type="expense",
+                    category_id=category.id,
+                    amount=Decimal("20.00"),
+                    occurred_on=date(2026, 10, 31),
+                ),
+                Transaction(
+                    type="expense",
+                    category_id=category.id,
+                    amount=Decimal("888.00"),
+                    occurred_on=date(2026, 11, 1),
+                ),
+            ]
+        )
+        db.session.commit()
+
+    response = client.get("/api/statistics/category?month=2026-10")
+
+    assert response.status_code == 200
+    assert response.get_json()["total"] == 30.0
+
+
+def test_empty_month_and_leap_year_daily_series(client):
+    empty_category = client.get("/api/statistics/category?month=2026-02")
+    empty_daily = client.get("/api/statistics/daily?month=2024-02")
+
+    assert empty_category.status_code == 200
+    assert empty_category.get_json() == {
+        "month": "2026-02",
+        "total": 0.0,
+        "labels": [],
+        "values": [],
+    }
+    assert empty_daily.status_code == 200
+    assert len(empty_daily.get_json()["days"]) == 29
+    assert all(value == 0.0 for value in empty_daily.get_json()["expenses"])
+
+
+def test_monthly_statistics_are_all_zero_without_transactions(client):
+    response = client.get("/api/statistics/months?end=2026-10&count=6")
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data["months"]) == 6
+    assert data["income"] == [0.0] * 6
+    assert data["expense"] == [0.0] * 6
